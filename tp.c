@@ -51,3 +51,18 @@ Povo* cria_grafo_arquivo(FILE *fp, int P, int C) {
 
     return grafo;
 }
+
+//imprime os tempos de usuário e de sistema no terminal
+void imprimir_tempos(struct rusage *inicio, struct rusage *fim) {
+    long segundos_usuario = fim->ru_utime.tv_sec - inicio->ru_utime.tv_sec;
+    long microssegundos_usuario = fim->ru_utime.tv_usec - inicio->ru_utime.tv_usec;
+
+    long segundos_sistema = fim->ru_stime.tv_sec - inicio->ru_stime.tv_sec;
+    long microssegundos_sistema = fim->ru_stime.tv_usec - inicio->ru_stime.tv_usec;
+
+    double tempo_usuario = segundos_usuario + microssegundos_usuario / 1e6;
+    double tempo_sistema = segundos_sistema + microssegundos_sistema / 1e6;
+
+    printf("Tempo de usuário: %.6f segundos\n", tempo_usuario);
+    printf("Tempo de sistema: %.6f segundos\n", tempo_sistema);
+}

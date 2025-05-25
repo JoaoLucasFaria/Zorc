@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
             saida = optarg;
             break;
         default:
-            fprintf(stderr, "Uso: %s -i <entrada.txt> -o <1 para estrategia> -s <saida.txt>\n", argv[0]);
+            fprintf(stderr, "Uso: %s -i <entrada.txt> -o <1 para Dinamica || 2 para heuristica> -s <saida.txt>\n", argv[0]);
             return 1;
         }
     }
@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     // Validação dos parâmetros obrigatórios
     if (!entrada || !saida || estrategia < 1 || estrategia > 2)
     {
-        fprintf(stderr, "Parâmetros obrigatórios faltando ou inválidos.\n");
+        fprintf(stderr, "ERRO. Uso: ./tp2 -i <entrada.txt> -o <1 para Dinamica || 2 para heuristica> -s <saida.txt>\n"); 
         return 1;
     }
 
@@ -113,13 +113,6 @@ int main(int argc, char *argv[])
     fclose(fp);
     fclose(out);
     getrusage(RUSAGE_SELF, &uso_fim);
-        // Tempo em segundos e microssegundos
-        long tempo_us = (uso_fim.ru_utime.tv_sec - uso_inicio.ru_utime.tv_sec) * 1000000L +
-                        (uso_fim.ru_utime.tv_usec - uso_inicio.ru_utime.tv_usec);
-
-        // Memória máxima usada (em kilobytes)
-        long memoria_kb = uso_fim.ru_maxrss;
-
-        fprintf(stderr, "Tempo = %.3f ms, Memória = %ld KB\n", tempo_us / 1000.0, memoria_kb);
+    imprimir_tempos(&uso_inicio, &uso_fim); // Imprime tempo de usuário e sistema
     return 0;
 }

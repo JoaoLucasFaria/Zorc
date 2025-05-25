@@ -27,5 +27,6 @@ Soldado *le_soldados_arquivo(FILE *fp, int P);
 Povo *cria_grafo_arquivo(FILE *fp, int P, int C);
 void libera_soldados(Soldado *soldados);
 void libera_grafo(Povo *grafo, int P);
+void imprimir_tempos(struct rusage *inicio, struct rusage *fim);
 
 #endif

@@ -21,40 +21,50 @@ void estrategia_heuristica(Povo *grafo, Soldado *soldados, int P, int W, int D, 
     int distancia_total = 0;
 
     int *visitado = malloc(P * sizeof(int));
-    int *recrutados = malloc(P * sizeof(int));
+    int *recrutados = calloc(P, sizeof(int));
     int visitados = 0;
 
     for (int i = 0; i < P; i++)
-    {
         visitado[i] = -1;
-        recrutados[i] = 0;
-    }
 
-    // Escolhe o melhor povo para começar (maior eficiência habilidade/peso)
+    // Escolhe o melhor povo inicial com maior eficiência
     int atual = -1;
     double melhor_ratio = -1;
     for (int i = 0; i < P; i++)
     {
-        double ratio = (double)soldados[i].habilidade / soldados[i].peso;
-        if (ratio > melhor_ratio)
+        if (soldados[i].peso > 0)
         {
-            melhor_ratio = ratio;
-            atual = i;
+            double ratio = (double)soldados[i].habilidade / soldados[i].peso;
+            if (ratio > melhor_ratio)
+            {
+                melhor_ratio = ratio;
+                atual = i;
+            }
         }
+    }
+
+    if (atual == -1)
+    {
+        fprintf(out, "0\n");
+        free(visitado);
+        free(recrutados);
+        return;
     }
 
     while (1)
     {
-        // Marca o atual como visitado
         visitado[visitados++] = atual;
 
-        // Recruta o máximo possível (mochila infinita)
+        // Recruta máximo permitido respeitando o peso total
         int max_qtd = (soldados[atual].peso == 0) ? 0 : (W - peso_total) / soldados[atual].peso;
-        recrutados[atual] = max_qtd;
-        habilidade_total += max_qtd * soldados[atual].habilidade;
-        peso_total += max_qtd * soldados[atual].peso;
+        if (max_qtd > 0)
+        {
+            recrutados[atual] = max_qtd;
+            habilidade_total += max_qtd * soldados[atual].habilidade;
+            peso_total += max_qtd * soldados[atual].peso;
+        }
 
-        // Encontra o melhor vizinho para ir (melhor eficiência, dentro do D restante)
+        // Seleciona melhor vizinho (eficiência) dentro da distância restante
         int proximo = -1;
         double melhor_score = -1;
         for (int i = 0; i < grafo[atual].qtd_vizinhos; i++)
@@ -66,6 +76,8 @@ void estrategia_heuristica(Povo *grafo, Soldado *soldados, int P, int W, int D, 
                 continue;
             if (distancia_total + dist > D)
                 continue;
+            if (soldados[viz].peso == 0)
+                continue;
 
             double ratio = (double)soldados[viz].habilidade / soldados[viz].peso;
             if (ratio > melhor_score)
@@ -75,11 +87,10 @@ void estrategia_heuristica(Povo *grafo, Soldado *soldados, int P, int W, int D, 
             }
         }
 
-        // Se não há para onde ir, parar
         if (proximo == -1)
             break;
 
-        // Avança
+        // Soma distância até próximo
         for (int i = 0; i < grafo[atual].qtd_vizinhos; i++)
         {
             if (grafo[atual].vizinhos[i].destino == proximo)
@@ -88,15 +99,22 @@ void estrategia_heuristica(Povo *grafo, Soldado *soldados, int P, int W, int D, 
                 break;
             }
         }
+
         atual = proximo;
     }
 
-    // Escreve no arquivo de saída
+    // Ignora povos iniciais com recrutamento 0
+    int inicio_util = 0;
+    while (inicio_util < visitados && recrutados[visitado[inicio_util]] == 0)
+        inicio_util++;
+
+    // Impressão
     fprintf(out, "%d", habilidade_total);
     for (int i = 0; i < visitados; i++)
     {
         int id = visitado[i];
-        fprintf(out, " %d %d", id + 1, recrutados[id]);
+        if (recrutados[id] > 0)
+            fprintf(out, " %d %d", id + 1, recrutados[id]);
     }
     fprintf(out, "\n");
 
