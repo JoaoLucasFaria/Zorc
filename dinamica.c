@@ -11,7 +11,7 @@ typedef struct
     int *recrutados;
 } Resultado;
 
-// Aloca memória para a tabela de memoização e inicializa com -1
+// Aloca memória para a tabela de poda e inicializa com -1
 int ***aloca_memo(int P, int W, int D)
 {
     int ***memo = malloc(P * sizeof(int **));
@@ -30,7 +30,7 @@ int ***aloca_memo(int P, int W, int D)
     return memo;
 }
 
-// Libera memória da tabela de memoização
+// Libera memória da tabela de poda
 void libera_memo(int ***memo, int P, int W)
 {
     for (int i = 0; i < P; i++)
@@ -44,7 +44,7 @@ void libera_memo(int ***memo, int P, int W)
     free(memo);
 }
 
-// Função recursiva com memoização
+// Função recursiva com poda
 void busca(Povo *grafo, Soldado *soldados, int *visitado,
            int pos, int P, int W, int D,
            int peso, int dist, int habilidade,
@@ -56,7 +56,7 @@ void busca(Povo *grafo, Soldado *soldados, int *visitado,
     if (dist > D || peso > W)
         return;
 
-    // Memoização: evita recalcular estados piores
+    // Poda: evita recalcular estados piores
     if (memo[pos][peso][dist] != -1 && memo[pos][peso][dist] >= habilidade)
         return;
     memo[pos][peso][dist] = habilidade;
